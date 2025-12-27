@@ -1,0 +1,35 @@
+---
+title: CT Wrapper
+description: "The CTWrapper Smart Contract"
+---
+
+# CT Wrapper Contract
+
+The `CTWrapper` is a pivotal contract in the Bayex ecosystem. It serves as a bridge between the **ERC1155** tokens used by the Conditional Tokens Framework and the **ERC20** standard required by most DeFi applications, including Uniswap V4.
+
+## Key Functions
+
+### `wrap` / `_wrap`
+Wraps ERC1155 conditional tokens into ERC20 tokens.
+- **Inputs**: `conditionId`, `amounts`.
+- **Logic**: Transfers the ERC1155 tokens from the user to the Wrapper contract. Mints the corresponding amount of ERC20 tokens to the user.
+- **Safety**: Checks for valid amounts and ensures 1:1 backing.
+
+### `unwrap`
+Unwraps ERC20 tokens back into the underlying ERC1155 conditional tokens.
+- **Inputs**: `conditionId`, `amount`.
+- **Logic**: Burns the user's ERC20 tokens. Transfers the stored ERC1155 tokens back to the user.
+
+### `deployToken` (CREATE3)
+Deploys a new ERC20 token for a specific outcome.
+- **Determinism**: Uses `CREATE3` to ensure that the address of the token is deterministic based on the `ctid` (Condition ID).
+- **Naming**: Allows the first wrapper to define the name and symbol, but the address remains constant.
+
+## Design Decisions
+
+### ERC1155 Receiver
+The contract implements `onERC1155Received` and `onERC1155BatchReceived` to support "push" wrapping patterns, allowing users to wrap in a single transaction from the CTF if supported.
+
+### Gas Optimization
+- **Calldata**: String parameters for token names are passed as `calldata` to save gas.
+- **Slicing**: Efficient bytes slicing is used for name trimming.

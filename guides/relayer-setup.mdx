@@ -1,0 +1,43 @@
+---
+title: Secure Relayer
+description: "Handling private keys securely"
+---
+
+# Secure Relayer Setup
+
+Bayex uses a relayer system to subsidize gas for user onboarding or specific interactions. Security is paramount when handling the relayer's private keys.
+
+## The Problem
+Storing private keys on the client-side (e.g., in `.env` exposed to the browser) is a critical security vulnerability.
+
+## The Solution: Server-Side Proxy
+
+We implement a server-side proxy using Next.js API routes.
+
+### Architecture
+
+1.  **Client Request**: The frontend constructs the transaction details (to, data, value) but **does not sign it**.
+2.  **API Call**: The frontend sends this payload to `/api/relay`.
+3.  **Server Processing**:
+    - The API route (`app/api/relay/route.ts`) loads the `RELAYER_PRIVATE_KEY` from the server-side environment variables.
+    - It validates the request (e.g., checks if the user is authorized, rate limits).
+    - It signs the transaction using the loaded key.
+    - It broadcasts the signed transaction to the network.
+4. **Response**: The transaction hash is returned to the client.
+
+### Implementation Details
+
+**Environment Variables:**
+Ensure `RELAYER_PRIVATE_KEY` is set in your deployment environment (e.g., Vercel, Docker) and **never** prefixed with `NEXT_PUBLIC_`.
+
+```typescript
+// app/api/relay/route.ts
+import { NextResponse } from 'next/server';
+import { walletClient } from '@/services/wallet'; // Server-side wallet
+
+export async function POST(request: Request) {
+  // ... validation logic ...
+  const tx = await walletClient.sendTransaction({ ... });
+  return NextResponse.json({ txHash: tx });
+}
+```
