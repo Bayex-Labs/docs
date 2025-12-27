@@ -1,59 +1,67 @@
 ---
-title: Introduction
-description: "Welcome to the Bayex Protocol Documentation"
+title: The Bayex Protocol
+sidebarTitle: Protocol Overview
+description: "Bayex is the first decentralized protocol enabling yield-bearing liquidity for Polymarket."
 ---
 
-# What is Bayex?
-
-**Bayex** is a decentralized protocol built on top of the **Conditional Tokens (CT)** framework and **Uniswap V4**. It enables the creation, trading, and resolution of prediction markets and other contingent asset classes with unparalleled efficiency and flexibility.
-
-<Card
-  title="Launch App"
-  icon="rocket"
-  href="https://app.bayex.xyz"
->
-  Start trading on Bayex today.
-</Card>
-
-## Core Features
-
-Bayex leverages advanced DeFi primitives to offer a superior trading experience:
+By combining Polymarket's **Conditional Tokens** with **Uniswap V4's** concentrated liquidity, we unlock a new era of capital efficiency for outcome trading.
 
 <CardGroup cols={2}>
-  <Card
-    title="Conditional Tokens"
-    icon="layer-group"
-    href="/architecture/ct-framework"
-  >
-    Utilizing the Gnosis Conditional Tokens Framework for combinatorial outcomes.
+  <Card title="Start Trading" icon="rocket" href="https://www.bayex.xyz/swap">
+    Start trading on Bayex today.
   </Card>
-  <Card
-    title="Uniswap V4 Hooks"
-    icon="code-branch"
-    href="/contracts/uniswap-v4-integration"
-  >
-    Custom hooks for seamless integration between CT assets and Uniswap liquidity.
-  </Card>
-  <Card
-    title="Polymarket Integration"
-    icon="chart-line"
-    href="/architecture/overview"
-  >
-    Fetching and displaying market data from Polymarket for rich user context.
-  </Card>
-  <Card
-    title="Secure Relayer"
-    icon="shield-check"
-    href="/security/relayer"
-  >
-    Gas-abstracted transactions ensuring a smooth user onboarding experience.
+  <Card title="Provide Liquidity" icon="coins" href="https://www.bayex.xyz/earn">
+    Provide liquidity and earn fees.
   </Card>
 </CardGroup>
 
-## Getting Started
+## Core Mechanics
 
-Whether you are a trader, a liquidity provider, or a developer building on top of Bayex, these docs will guide you through the ecosystem.
+<CardGroup cols={2}>
+  <Card title="Conditional Token Wrapping" icon="layer-group">
+    Polymarket uses the **ERC-1155** standard for outcome shares, which are incompatible with most DeFi AMMs.
+    
+    Bayex introduces a trustless **Wrapper Contract** that locks these ERC-1155 tokens and mints standard **ERC-20** tokens 1:1.
+  </Card>
+  <Card title="Uniswap V4 Integration" icon="bolt">
+    We leverage **Uniswap V4** to create concentrated liquidity pools for these wrapped outcome tokens.
+    
+    This allows LPs to provide liquidity in specific price ranges (probabilities), dramatically increasing capital efficiency compared to traditional AMMs.
+  </Card>
+</CardGroup>
 
-- **[Architecture](/architecture/overview)**: Understand the high-level design.
-- **[Smart Contracts](/contracts/ct-wrapper)**: Dive into the code.
-- **[Developer Guide](/guides/frontend-integration)**: Integrate with the Bayex SDK.
+## Yield Generation
+
+<CardGroup cols={3}>
+  <Card title="Trading Fees" icon="chart-simple">
+    LPs earn swap fees every time a user trades against their position. With V4, fees are auto-compounded.
+  </Card>
+  <Card title="Underlying Yield" icon="coins">
+    **(Coming Soon)** Collateral parked in Bayex contracts can be deployed to lending protocols like Aave.
+  </Card>
+  <Card title="No Impermanent Loss*" icon="shield-check">
+    *If you hold to expiry, the winning outcome redeems 1:1 for collateral, mitigating divergence loss.
+  </Card>
+</CardGroup>
+
+## Architecture
+
+<Steps>
+  <Step title="Polymarket (Source)">
+    Polymarket serves as the source of truth for markets and settlement resolution.
+  </Step>
+  <Step title="Bayex Wrapper (Wrap/Unwrap)">
+    Users utilize the **Bayex Wrapper** to convert their Polymarket ERC-1155 tokens into Bayex ERC-20s.
+  </Step>
+  <Step title="Uniswap V4 (Swap/LP)">
+    These ERC-20s are then used in **Uniswap V4** pools for swapping and liquidity provision, managed by Bayex Hooks.
+  </Step>
+</Steps>
+
+<Card
+  title="Ready to optimize your yield?"
+  icon="arrow-right"
+  href="https://www.bayex.xyz/earn"
+>
+  Join the first wave of liquidity providers on Bayex and start earning fees on the world's biggest Polymarket events.
+</Card>

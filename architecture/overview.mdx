@@ -1,61 +1,55 @@
 ---
-title: System Overview
-description: "High-level architecture of the Bayex Protocol"
+title: Protocol Architecture
+sidebarTitle: Overview
+description: "Understanding the components that power Bayex's gasless, high-frequency trading experience."
 ---
 
-# Architecture Overview
+<Note>
+  **Technical Deep Dive**
+  
+  This section explores the underlying infrastructure that makes Bayex possible.
+</Note>
 
-The Bayex Protocol is composed of several key components that interact to facilitate prediction market operations.
+## System Components
 
-## High-Level Diagram
+<CardGroup cols={1}>
+  <Card title="Smart Accounts (Safe)" icon="shield-halved">
+    User wallets on Bayex are not EOAs (Externally Owned Accounts). Instead, we deploy a **Safe** (formerly Gnosis Safe) for every user.
 
-```mermaid
-graph TD
-    User[User] -->|Interacts| Frontend[Bayex Frontend]
-    User -->|Transacts| Relayer[Secure Relayer]
-    
-    subgraph "On-Chain (Base)"
-        CT[Conditional Tokens Framework]
-        Wrapper[CT Wrapper Contract]
-        UniV4[Uniswap V4 PoolManager]
-        Hooks[Bayex Usage Hooks]
-        
-        Wrapper -->|Wraps/Unwraps| CT
-        Wrapper -->|Mints/Burns| CTERC20[CT ERC20 Tokens]
-        
-        CTERC20 <-->|Swapped via| UniV4
-        UniV4 -->|Callbacks| Hooks
-    end
-    
-    subgraph "Off-Chain Data"
-        Poly[Polymarket API]
-        Graph[The Graph / Goldsky]
-    end
-    
-    Frontend -->|Fetches Data| Graph
-    Frontend -->|Fetches Details| Poly
-    Relayer -->|Executes Tx| Wrapper
-```
+    **Compatibility:** We utilize the exact same proxy architecture as **Polymarket**. This means if you have an existing Polymarket account, it is **100% compatible** and usable on Bayex immediately.
 
-## Components
+    This Smart Account acts as a proxy, allowing for:
 
-### 1. Conditional Tokens Framework (CTF)
-The backbone of the system, established by Gnosis. It allows for:
-- **Splitting**: Collateral is split into outcome tokens (e.g., YES/NO).
-- **Merging**: Outcome tokens are merged back into collateral.
-- **Redemption**: Winning outcome tokens are redeemable for the collateral.
+    *   <Icon icon="circle-check" iconType="solid" color="#22c55e" /> **Gasless Transactions (Sponsored)**
+    *   <Icon icon="circle-check" iconType="solid" color="#22c55e" /> **Batched Operations (Wrap + Swap)**
+    *   <Icon icon="circle-check" iconType="solid" color="#22c55e" /> **Session Keys (Future Scope)**
+  </Card>
 
-### 2. CT Wrapper
-A custom contract that wraps the ERC1155 tokens from the CTF into standard **ERC20** tokens. This is crucial for compatibility with Uniswap V4, which operates on ERC20s.
-- **ERC1155 Interaction**: Handles the `safeBatchTransferFrom` from CTF.
-- **ERC20 Minting**: Mints a distinct ERC20 for each outcome (e.g., `CT-YES`, `CT-NO`).
+  <Card title="The Relayer" icon="network-wired">
+    Bayex utilizes a centralized (but strictly non-custodial) relayer service to submit transactions on behalf of users.
 
-### 3. Uniswap V4 Integration
-Bayex utilizes Uniswap V4 for liquidity provision and trading.
-- **PoolManager**: Manages the liquidity pools for the Conditional Token ERC20s.
-- **Hooks**: Custom logic executed before/after swaps and modifications. This ensures correct pricing and interaction with the CT Wrapper.
+    `User Signature (EIP-712) -> Relayer API -> Blockchain -> Execution`
 
-### 4. Frontend & Indexing
-- **Frontend**: A Next.js application using `wagmi` and `viem`.
-- **Indexing**: Uses The Graph/Goldsky to index `TokenDeployed` and other events to quickly populate the UI with available markets.
-- **External Data**: Enriches market data (titles, icons, descriptions) by cross-referencing with the Polymarket API using the `conditionId`.
+    This ensures users never need MATIC (Polygon gas token) to interact with the protocol.
+  </Card>
+
+  <Card title="CT Wrapper Contract" icon="box-open">
+    The core innovation. Polymarket uses the Conditional Tokens Framework (ERC-1155). To make these compatible with Uniswap V4 (which works best with ERC-20s), we use a Wrapper.
+
+    <CardGroup cols={2}>
+      <Card title="Wrap">
+        User sends ERC-1155 -> Wrapper locks it -> Mints ERC-20 (CTERC20)
+      </Card>
+      <Card title="Unwrap">
+        User burns ERC-20 -> Wrapper unlocks ERC-1155 -> Sends to User
+      </Card>
+    </CardGroup>
+  </Card>
+
+  <Card title="Uniswap V4 Pool Manager" icon="server">
+    We use the singleton `PoolManager` contract to host all our prediction market pools.
+
+    *   **Hooks:** (Currently minimal) Future capability to add dynamic fees or KYC logic.
+    *   **Flash Accounting:** Efficient multi-hop swaps or complex portfolio rebalancing in a single transaction.
+  </Card>
+</CardGroup>

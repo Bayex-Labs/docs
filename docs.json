@@ -10,7 +10,7 @@
     "light": "#8EA0FF",
     "dark": "#404EED"
   },
-  "favicon": "/favicon.jpg",
+  "favicon": "favicon.png",
   "navigation": {
     "tabs": [
       {
@@ -19,7 +19,8 @@
           {
             "group": "Introduction",
             "pages": [
-              "introduction"
+              "introduction",
+              "quickstart"
             ]
           },
           {
@@ -33,6 +34,7 @@
             "group": "Smart Contracts",
             "pages": [
               "contracts/ct-wrapper",
+              "contracts/addresses",
               "contracts/uniswap-v4-integration"
             ]
           },
@@ -64,12 +66,12 @@
     "primary": {
       "type": "button",
       "label": "Launch App",
-      "href": "https://app.bayex.xyz"
+      "href": "https://www.bayex.xyz"
     }
   },
   "footer": {
     "socials": {
-      "x": "https://twitter.com/Bayex_Labs",
+      "x": "https://twitter.com/bayexyz",
       "github": "https://github.com/Bayex-Labs"
     }
   }
